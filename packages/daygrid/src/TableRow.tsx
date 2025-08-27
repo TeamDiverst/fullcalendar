@@ -16,7 +16,7 @@ import {
   renderFill,
   sortEventSegs,
 } from '@teamdiverst/fullcalendar-core/internal'
-import {createElement, createRef, Fragment, VNode,} from '@teamdiverst/fullcalendar-core/preact'
+import {createElement, createRef, Fragment, VNode} from '@teamdiverst/fullcalendar-core/preact'
 import {splitSegsByFirstCol, TableSeg} from './TableSeg.js'
 import {TableCell} from './TableCell.js'
 import {TableListItemEvent} from './TableListItemEvent.js'
@@ -25,7 +25,7 @@ import {
   computeFgSegPlacement,
   generateSegKey,
   generateSegUid,
-  TableSegPlacement
+  TableSegPlacement,
 } from './event-placement.js'
 import {hasListItemDisplay} from './event-rendering.js'
 
@@ -139,7 +139,7 @@ export class TableRow extends DateComponent<TableRowProps, TableRowState> {
               if (isVisible && col > seg.firstCol && col <= seg.lastCol) {
                 const overlayButton = this.renderMultidayOverlayButton(seg, placement, col)
                 if (overlayButton) {
-                  normalFgNodes = [overlayButton, ...normalFgNodes];
+                  normalFgNodes = [overlayButton, ...normalFgNodes]
                 }
               }
             }
@@ -318,7 +318,7 @@ export class TableRow extends DateComponent<TableRowProps, TableRowState> {
   renderMultidayOverlayButton(
     seg: TableSeg,
     placement: TableSegPlacement,
-    colIndex: number
+    colIndex: number,
   ): VNode | null {
     const { eventRange } = seg
     const { def } = eventRange
@@ -369,7 +369,7 @@ export class TableRow extends DateComponent<TableRowProps, TableRowState> {
           {accessibilityLabel && (
             <span className="fc-visually-hidden">{accessibilityLabel}</span>
           )}
-          <span aria-hidden={accessibilityLabel ? "true" : undefined}>
+          <span aria-hidden={accessibilityLabel ? 'true' : undefined}>
             {def.title}
           </span>
         </button>
