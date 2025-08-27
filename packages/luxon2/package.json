@@ -1,6 +1,6 @@
 {
   "name": "@teamdiverst/fullcalendar-luxon2",
-  "version": "6.1.19",
+  "version": "6.1.19-a11y.1",
   "title": "FullCalendar Luxon 2 Plugin",
   "description": "Enhanced date formatting, conversion, and named time zone functionality with Luxon 2",
   "keywords": [
@@ -10,11 +10,11 @@
   ],
   "homepage": "https://fullcalendar.io/docs/luxon2",
   "peerDependencies": {
-    "@teamdiverst/fullcalendar-core": "~6.1.19",
+    "@teamdiverst/fullcalendar-core": "~6.1.19-a11y.1",
     "luxon": "^2.0.0"
   },
   "devDependencies": {
-    "@teamdiverst/fullcalendar-core": "~6.1.19",
+    "@teamdiverst/fullcalendar-core": "~6.1.19-a11y.1",
     "@fullcalendar-scripts/standard": "*",
     "@types/luxon": "^2.0.9",
     "luxon": "^2.0.0"
