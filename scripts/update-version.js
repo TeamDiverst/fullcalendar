@@ -27,12 +27,35 @@ function findProjectRoot() {
   let currentDir = __dirname
   while (currentDir !== path.dirname(currentDir)) {
     if (fs.existsSync(path.join(currentDir, 'package.json')) &&
-        fs.existsSync(path.join(currentDir, 'packages'))) {
+      fs.existsSync(path.join(currentDir, 'packages'))) {
       return currentDir
     }
     currentDir = path.dirname(currentDir)
   }
-  throw new Error('Could not find project root (looking for package.json and packages/ directory)')
+  throw new Error(
+    'Could not find project root (looking for package.json and packages/ directory)')
+}
+
+function updatePackageJsonFile(filePath, packageName, version) {
+  const json = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+
+  // Update the version property
+  json.version = version
+
+  // Update all @teamdiverst dependencies to same version (use exact version)
+  const depTypes = ['dependencies', 'devDependencies', 'peerDependencies']
+  depTypes.forEach(depType => {
+    if (json[depType]) {
+      Object.keys(json[depType]).forEach(dep => {
+        if (dep.startsWith('@teamdiverst/fullcalendar-')) {
+          json[depType][dep] = `~${version}`
+        }
+      })
+    }
+  })
+
+  fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n')
+  console.log(`Updated package ${packageName}`)
 }
 
 function main() {
@@ -50,7 +73,8 @@ function main() {
     process.exit(1)
   }
 
-  if (!/^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*))?$/.test(version)) {
+  if (!/^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*))?$/.test(
+    version)) {
     console.error(`Error: Invalid SemVer format "${version}"`)
     console.error('Expected format: X.Y.Z-pre-release.build')
     console.error('Examples: 6.1.19, 6.1.19-alpha, 6.1.19-a11y.1')
@@ -60,6 +84,20 @@ function main() {
   try {
     const projectRoot = findProjectRoot()
     let oldVersion = null
+    const tag = `v${version}`
+
+    // Check if there are uncommitted changes
+    if (execSync('git status --porcelain', {encoding: 'utf8'}).trim()) {
+      console.error('Error: There are uncommitted changes in the repository')
+      console.error('Please commit or stash your changes before running this script')
+      process.exit(1)
+    }
+
+    // Check if a git tag for the new version already exists
+    if (execSync(`git tag -l ${tag}`, {encoding: 'utf8'}).trim()) {
+      console.error(`Error: Git tag "${tag}" already exists`)
+      process.exit(1)
+    }
 
     // Update root package.json
     const rootPackageFile = path.join(projectRoot, 'package.json')
@@ -67,47 +105,33 @@ function main() {
       const rootData = JSON.parse(fs.readFileSync(rootPackageFile, 'utf8'))
       oldVersion = rootData.version
       rootData.version = version
-      fs.writeFileSync(rootPackageFile, JSON.stringify(rootData, null, 2) + '\n')
+      fs.writeFileSync(rootPackageFile,
+        JSON.stringify(rootData, null, 2) + '\n')
       console.log(`Updated root package.json to ${version}`)
     }
 
-    // Find Fullcalendar packages
+    // Find packages
     const packagesDir = path.join(projectRoot, 'packages')
     const packages = fs.readdirSync(packagesDir).filter(dir =>
       fs.statSync(path.join(packagesDir, dir)).isDirectory(),
-    )
+    ).map(pkg => ({name: pkg, dir: path.join(packagesDir, pkg)}))
+    // Also include the bundle pacakge
+    packages.push({name: 'bundle', dir: path.join(projectRoot, 'bundle')})
 
-    // Update package.json files on all packages
-    packages.forEach(pkg => {
-      const packageFile = path.join(packagesDir, pkg, 'package.json')
+    // Update package.json files
+    packages.forEach(({name, dir}) => {
+      const packageFile = path.join(dir, 'package.json')
       if (fs.existsSync(packageFile)) {
-        const json = JSON.parse(fs.readFileSync(packageFile, 'utf8'))
-
-        // Update the version property
-        json.version = version
-
-        // Update all @teamdiverst dependencies to same version (use exact version)
-        const depTypes = ['dependencies', 'devDependencies', 'peerDependencies']
-        depTypes.forEach(depType => {
-          if (json[depType]) {
-            Object.keys(json[depType]).forEach(dep => {
-              if (dep.startsWith('@teamdiverst/fullcalendar-')) {
-                json[depType][dep] = `~${version}`
-              }
-            })
-          }
-        })
-
-        fs.writeFileSync(packageFile, JSON.stringify(json, null, 2) + '\n')
-        console.log(`Updated package ${pkg}`)
+        updatePackageJsonFile(packageFile, name, version)
       }
     })
 
-    execSync('git add package.json packages/*/package.json', {stdio: 'inherit'})
-    execSync(`git commit -m "Updated version from ${oldVersion} to ${version}"`, {stdio: 'inherit'})
+    execSync('git add package.json packages/*/package.json bundle/package.json',
+      {stdio: 'inherit'})
+    execSync(`git commit -m "Updated version from ${oldVersion} to ${version}"`,
+      {stdio: 'inherit'})
     console.log('Committed changes on affected files')
 
-    const tag = `v${version}`
     execSync(`git tag ${tag}`, {stdio: 'inherit'})
     console.log(`Created git tag ${tag}`)
 
