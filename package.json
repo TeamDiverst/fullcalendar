@@ -2,7 +2,7 @@
   "private": true,
   "name": "@fullcalendar-monorepos/standard",
   "description": "Full-sized drag & drop event calendar in JavaScript",
-  "version": "6.1.19",
+  "version": "6.1.19-a11y.1",
   "keywords": [
     "calendar",
     "event",
@@ -34,7 +34,8 @@
     "test": "standard-scripts test",
     "test:dev": "standard-scripts test --dev",
     "clean": "standard-scripts clean",
-    "ci": "pnpm run lint && pnpm run build && pnpm run test"
+    "ci": "pnpm run lint && pnpm run build && pnpm run test",
+    "update-version": "node scripts/update-version.js"
   },
   "engines": {
     "pnpm": ">=9.5.0"

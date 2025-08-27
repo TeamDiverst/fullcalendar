@@ -58,7 +58,7 @@ export class EventContainer extends BaseComponent<EventContainerProps> {
     return (
       <Fragment>
         <span className="fc-visually-hidden">{accessibilityLabel}</span>
-        <span aria-hidden="true" style={{ display: "flex", alignItems: "center" }}>{originalContent}</span>
+        <span aria-hidden="true" style={{ display: 'flex', alignItems: 'center' }}>{originalContent}</span>
       </Fragment>
     )
   }
