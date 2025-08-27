@@ -18,6 +18,9 @@ Usage:
  scripts/update-version.js <version>
  or
  npm run update-version <version>
+
+Note: After updating the version, remember to run 'npm install' to install
+the updated dependencies and update the lock file with the new version.
 `
 
 const __filename = fileURLToPath(import.meta.url)
