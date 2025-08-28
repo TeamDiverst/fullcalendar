@@ -139,7 +139,7 @@ export class TableRow extends DateComponent<TableRowProps, TableRowState> {
               if (isVisible && col > seg.firstCol && col <= seg.lastCol) {
                 const overlayButton = this.renderMultidayOverlayButton(seg, placement, col)
                 if (overlayButton) {
-                  normalFgNodes = [overlayButton, ...normalFgNodes]
+                  normalFgNodes = [...normalFgNodes, overlayButton]
                 }
               }
             }
